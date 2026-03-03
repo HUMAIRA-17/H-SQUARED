@@ -1,0 +1,204 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>H-SQUARED | Jewelry</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+/* SEARCH BAR STYLE */
+.shop-search {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.shop-search input {
+  width: 60%;
+  max-width: 400px;
+  padding: 12px 16px;
+  border-radius: 30px;
+  border: 1px solid #f8bbd0;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.shop-search input:focus {
+  border-color: #e91e63;
+  box-shadow: 0 0 0 3px rgba(233,30,99,0.15);
+}
+
+/* Tabs */
+.collection-tabs {
+  text-align: center;
+  margin: 30px 0 10px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.collection-tabs span {
+  margin: 0 25px;
+  cursor: pointer;
+  position: relative;
+  padding-bottom: 6px;
+  transition: 0.3s;
+}
+
+.collection-tabs span.active-tab {
+  color: #e91e63;
+}
+
+.collection-tabs span.active-tab::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background: #e91e63;
+  left: 0;
+  bottom: 0;
+  border-radius: 4px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="notifyBox" class="notify"></div>
+
+<header class="navbar">
+<div class="logo-wrap">
+  <div class="logo-circle">
+    <img src="logo.png">
+  </div>
+  <div class="logo">H<span>-SQUARED</span></div>
+</div>
+
+<nav>
+  <a href="#home">Home</a>
+  <a href="#shop">Shop</a>
+  <a href="#about">About</a>
+  <a href="#contact">Contact</a>
+  <a href="cart.html">🛒 Cart (<span id="cartCount">0</span>)</a>
+</nav>
+</header>
+
+<section class="hero" id="home">
+<div class="hero-text">
+<h1>Timeless Jewelry<br>For Every Occasion</h1>
+<p>Discover rings, necklaces, and earrings crafted for elegance.</p>
+<a href="#shop" class="btn-primary">Shop Collection</a>
+</div>
+
+<div class="hero-img">
+<img src="hero.png" alt="Jewelry Image">
+</div>
+</section>
+
+<section class="shop" id="shop">
+
+<div class="shop-search">
+  <input type="text" id="homeSearch" placeholder="Search jewelry...">
+</div>
+
+<div class="collection-tabs">
+  <span id="collectionTab" class="active-tab">Our Collection</span>
+  <span id="dealsTab">Deals</span>
+</div>
+
+<div class="product-grid" id="productGrid"></div>
+
+</section>
+
+<section class="about" id="about">
+<h2>About H-SQUARED</h2>
+<p>H-SQUARED is dedicated to elegant jewelry crafted to enhance your beauty.</p>
+</section>
+
+<!-- ✅ CONTACT SECTION FIXED -->
+<section class="contact" id="contact">
+  <h2>Contact Us</h2>
+  <form class="contact-form" id="contactForm">
+    <input type="text" id="name" placeholder="Your Name" required maxlength="100">
+    <input type="email" id="email" placeholder="Your Email" required maxlength="150">
+    <textarea id="message" placeholder="Your Message" required maxlength="500"></textarea>
+    <button type="submit">Send Message</button>
+  </form>
+</section>
+
+<footer>
+<p>© 2026 H-SQUARED Jewelry</p>
+</footer>
+
+<a href="https://wa.me/923355903530" class="whatsapp-btn" target="_blank">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="product.js"></script>
+
+<!-- ✅ CONTACT FORM WORKING SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const supabaseUrl = "https://lffgwwnymaldoiohukum.supabase.co"; 
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmZmd3d255bWFsZG9pb2h1a3VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2Mjk5NDcsImV4cCI6MjA4NjIwNTk0N30._YaYuA1dHc-dMtAFwV0FaZ4tWpNht8B9s3Y_2LI3EOM"; 
+
+
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  const form = document.getElementById("contactForm");
+  const notifyBox = document.getElementById("notifyBox");
+
+  function showNotification(message, isError = false) {
+    notifyBox.textContent = message;
+    notifyBox.classList.add("show");
+
+    if (isError) {
+      notifyBox.classList.add("error");
+    } else {
+      notifyBox.classList.remove("error");
+    }
+
+    setTimeout(() => {
+      notifyBox.classList.remove("show");
+    }, 3000);
+  }
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const message = document.getElementById("message").value.trim();
+
+    if (!name || !email || !message) {
+      showNotification("All fields are required", true);
+      return;
+    }
+
+    const { error } = await supabase
+      .from("contact_messages")
+      .insert([{ name, email, message }]);
+
+    if (error) {
+      showNotification("Error sending message", true);
+      console.log(error);
+    } else {
+      showNotification(" Message sent successfully!");
+      form.reset();
+    }
+  });
+
+});
+</script>
+
+<script src="cart.js"></script>
+
+</body>
+</html>

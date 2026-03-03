@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login - H-SQUARE</title>
+
+  <!-- Correct Supabase v2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ff9ecf, #ff4fa3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background: white;
+      padding: 40px;
+      width: 350px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    h2 {
+      color: #ff4fa3;
+      margin-bottom: 30px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    input:focus {
+      border-color: #ff4fa3;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .eye-icon {
+      position: absolute;
+      right: 12px;
+      top: 40%;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #ff4fa3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #e13c8d;
+    }
+
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-container">
+    <h2>Admin Login</h2>
+
+    <form id="adminLogin">
+      <input type="email" id="email" placeholder="Admin Email" required>
+
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="Password" required>
+        <span class="eye-icon" id="eye">👁</span>
+      </div>
+
+      <button type="submit">Login</button>
+      <div class="error" id="errorMsg"></div>
+    </form>
+  </div>
+
+<script>
+  // Correct Supabase initialization
+  const { createClient } = supabase;
+  const client = createClient(
+    "https://lffgwwnymaldoiohukum.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmZmd3d255bWFsZG9pb2h1a3VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2Mjk5NDcsImV4cCI6MjA4NjIwNTk0N30._YaYuA1dHc-dMtAFwV0FaZ4tWpNht8B9s3Y_2LI3EOM"
+  );
+
+  // Eye toggle FIXED
+  document.getElementById("eye").addEventListener("click", function () {
+    const passwordInput = document.getElementById("password");
+    passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+  });
+
+  // Login
+  document.getElementById("adminLogin").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const errorMsg = document.getElementById("errorMsg");
+
+    errorMsg.textContent = "";
+
+    const { data, error } = await client.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+
+    if (error) {
+      errorMsg.textContent = "Invalid email or password";
+      return;
+    }
+
+    const user = data.user;
+
+    const { data: profile, error: profileError } = await client
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profile) {
+      errorMsg.textContent = "Profile not found";
+      return;
+    }
+
+    if (profile.role === "admin") {
+      window.location.href = "admin.html";  // IMPORTANT: remove leading slash
+    } else {
+      errorMsg.textContent = "Access denied";
+      await client.auth.signOut();
+    }
+  });
+</script>
+
+</body>
+</html>

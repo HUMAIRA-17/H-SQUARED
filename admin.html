@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel | H-SQUARED</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body {
+  font-family: Poppins, sans-serif;
+  background: #fff5f8;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  color: #e91e63;
+}
+
+/* CATEGORY DROPDOWN STYLING */
+.category-wrapper {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 250px;
+}
+
+.category-wrapper label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #e91e63;
+}
+
+.category-wrapper select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #f8bbd0;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23e91e63' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.category-wrapper select:hover {
+  border-color: #e91e63;
+}
+
+.category-wrapper select:focus {
+  border-color: #e91e63;
+  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.15);
+}
+
+/* FORM */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+form input, 
+form textarea, 
+form button {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+form input, 
+form textarea {
+  flex: 1 1 200px;
+}
+
+form button {
+  flex: 1 1 100px;
+  background: #e91e63;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+form button:hover {
+  background: #c2185b;
+}
+
+#productSearch {
+  width: 100%;
+  padding: 10px;
+  margin: 20px 0;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+/* TABLE */
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+}
+
+.product-table th, 
+.product-table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.product-table img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.action-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+}
+
+.delete-btn { background: #e53935; }
+.edit-btn { background: #3949ab; }
+/* ADMIN NAV */
+.admin-nav {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.admin-nav button {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background: #f8bbd0;
+  color: #e91e63;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.admin-nav button:hover {
+  background: #e91e63;
+  color: white;
+}
+.sold-btn {
+  background: #ff9800;
+}
+
+.sold-btn:hover {
+  background: #f57c00;
+}
+/* ===== ADMIN NAVBAR ===== */
+.admin-navbar {
+  background: white;
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.admin-logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e91e63;
+  letter-spacing: 1px;
+}
+
+.admin-logo span {
+  color: #111;
+}
+
+.admin-menu {
+  display: flex;
+  gap: 30px;
+}
+
+.admin-menu a {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  position: relative;
+  transition: 0.3s ease;
+}
+
+.admin-menu a:hover {
+  color: #e91e63;
+}
+
+/* Active link underline animation */
+.admin-menu a.active {
+  color: #e91e63;
+}
+
+.admin-menu a.active::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: #e91e63;
+  bottom: -6px;
+  left: 0;
+  border-radius: 5px;
+}
+</style>
+</head>
+<body>
+
+
+<div class="admin-navbar">
+  <div class="admin-logo">H<span>-SQUARED</span></div>
+  <div class="admin-menu">
+    <a href="admin.html" class="active">Products</a>
+    <a href="orders.html">Orders</a>
+    <a href="messages.html">Messages</a>
+  </div>
+</div>
+<div class="container">
+<h2>Admin Dashboard</h2>
+<!-- CATEGORY DROPDOWN -->
+<div class="category-wrapper">
+  <label for="category">Category</label>
+  <select id="category" required>
+    <option value="collection">Collection</option>
+    <option value="deal">Deal</option>
+  </select>
+</div>
+
+<!-- ADD/EDIT PRODUCT FORM -->
+<form id="productForm">
+<input type="hidden" id="productId">
+<input id="name" placeholder="Product Name" required>
+<textarea id="description" placeholder="Description" required></textarea>
+<input id="price" type="number" placeholder="Price (PKR)" required>
+<input id="discountPrice" type="number" placeholder="Discounted Price (PKR)">
+<input id="image" type="file" accept="image/*">
+<input id="image2" type="file" accept="image/*">
+<input id="image3" type="file" accept="image/*">
+<img id="preview" src="" style="width:100px;height:100px;object-fit:cover;display:none;">
+<button type="submit">Add / Update Product</button>
+</form>
+
+<input type="text" id="productSearch" placeholder="Search product...">
+
+<!-- PRODUCT TABLE -->
+<table class="product-table" id="productTable">
+<thead>
+<tr>
+<th>Image</th>
+<th>Name</th>
+<th>Description</th>
+<th>Price</th>
+<th>Discount</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

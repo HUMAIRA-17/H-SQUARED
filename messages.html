@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Messages | H-SQUARED</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body {
+  font-family: Poppins, sans-serif;
+  background: #fff5f8;
+  margin: 0;
+}
+
+/* ===== NAVBAR ===== */
+.admin-navbar {
+  background: white;
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.admin-logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e91e63;
+}
+
+.admin-logo span {
+  color: black;
+}
+
+.admin-menu {
+  display: flex;
+  gap: 25px;
+}
+
+.admin-menu a {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  transition: 0.3s;
+}
+
+.admin-menu a:hover {
+  color: #e91e63;
+}
+
+/* ===== CONTAINER ===== */
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+h2 {
+  color: #e91e63;
+  margin-bottom: 25px;
+}
+
+/* ===== MESSAGE CARDS ===== */
+.message-card {
+  background: white;
+  padding: 22px;
+  border-radius: 15px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  transition: 0.3s;
+}
+
+.message-card:hover {
+  transform: translateY(-4px);
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.message-name {
+  font-weight: 600;
+  color: #e91e63;
+  font-size: 16px;
+}
+
+.message-email {
+  font-size: 13px;
+  color: #777;
+}
+
+.message-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.message-text {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+  margin-top: 50px;
+}
+</style>
+</head>
+<body>
+
+<div class="admin-navbar">
+  <div class="admin-logo">H<span>-SQUARED</span></div>
+  <div class="admin-menu">
+    <a href="admin.html">Products</a>
+    <a href="orders.html">Orders</a>
+    <a href="messages.html" class="active">Messages</a>
+  </div>
+</div>
+
+<div class="container">
+  <h2>Customer Messages</h2>
+  <div id="messagesContainer"></div>
+</div>
+
+<script>
+const supabaseUrl = "https://lffgwwnymaldoiohukum.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmZmd3d255bWFsZG9pb2h1a3VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2Mjk5NDcsImV4cCI6MjA4NjIwNTk0N30._YaYuA1dHc-dMtAFwV0FaZ4tWpNht8B9s3Y_2LI3EOM";
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+async function loadMessages() {
+  const { data, error } = await supabaseClient
+    .from("contact_messages")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  const container = document.getElementById("messagesContainer");
+  container.innerHTML = "";
+
+  if (error) {
+    container.innerHTML = "<p class='empty-state'>Error loading messages</p>";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.innerHTML = "<p class='empty-state'>No messages yet.</p>";
+    return;
+  }
+
+  data.forEach(msg => {
+    const card = document.createElement("div");
+    card.className = "message-card";
+
+    card.innerHTML = `
+      <div class="message-header">
+        <div>
+          <div class="message-name">${msg.name}</div>
+          <div class="message-email">${msg.email}</div>
+        </div>
+        <div class="message-date">
+          ${new Date(msg.created_at).toLocaleString()}
+        </div>
+      </div>
+      <div class="message-text">${msg.message}</div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+loadMessages();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Product Details</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+:root {
+  --primary-pink: #e91e63;
+  --light-pink: #fff5f8;
+  --dark-pink: #c2185b;
+  --text-dark: #333;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--light-pink);
+  color: var(--text-dark);
+}
+
+/* MAIN LAYOUT */
+.product-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 80px;
+  padding: 80px 8%;
+  flex-wrap: wrap;
+}
+
+.product-gallery {
+  flex: 1;
+  max-width: 500px;
+  position: relative; /* IMPORTANT */
+}
+
+
+.main-img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 16px;
+  background: #f4f4f4;
+  margin-bottom: 18px;
+}
+
+.thumbnail-row {
+  display: flex;
+  gap: 12px;
+}
+
+.thumbnail-row img {
+  width: 85px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 10px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.thumbnail-row img:hover {
+  opacity: 1;
+  border-color: var(--primary-pink);
+}
+
+/* PRODUCT INFO */
+.product-info {
+  flex: 1;
+  max-width: 420px;
+}
+
+.product-info h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.product-info p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.price {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--primary-pink);
+  margin-bottom: 35px;
+}
+
+/* BUTTON */
+.add-cart-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary-pink);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.add-cart-btn:hover {
+  background: var(--dark-pink);
+}
+
+.success-message {
+  margin-top: 15px;
+  font-size: 14px;
+  color: var(--dark-pink);
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .product-page {
+    padding: 40px 6%;
+    gap: 40px;
+  }
+
+  .main-img {
+    height: 380px;
+  }
+}
+.notify {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 14px 22px;
+  border-left: 5px solid var(--primary-pink);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  font-size: 14px;
+  color: var(--text-dark);
+  opacity: 0;
+  transform: translateX(100%);
+  transition: 0.4s ease;
+  z-index: 9999;
+}
+
+.notify.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.notify.success {
+  border-left-color: var(--primary-pink);
+}
+
+.notify.error {
+  border-left-color: #ff4d4d;
+}
+/* SOLD OUT BADGE */
+.soldout-badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(233, 30, 99, 0.95);
+  color: white;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 20px;
+  z-index: 10;
+  letter-spacing: 1px;
+}
+
+</style>
+</head>
+
+<body>
+<header class="navbar">
+  <div class="logo">H<span>-SQUARED</span></div>
+  <nav>
+    <a href="index.html">← Continue Shopping</a>
+  </nav>
+</header>
+<div class="product-page">
+
+
+  <div class="product-gallery">
+
+  <!-- SOLD OUT BADGE -->
+  <div id="soldOutBadge" class="soldout-badge" style="display:none;">
+    SOLD OUT
+  </div>
+
+  <img id="mainImage" class="main-img">
+  <div class="thumbnail-row" id="thumbnails"></div>
+</div>
+
+
+  <div class="product-info" id="productInfo"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+
+const supabaseUrl = "https://lffgwwnymaldoiohukum.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmZmd3d255bWFsZG9pb2h1a3VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2Mjk5NDcsImV4cCI6MjA4NjIwNTk0N30._YaYuA1dHc-dMtAFwV0FaZ4tWpNht8B9s3Y_2LI3EOM";
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+const urlParams = new URLSearchParams(window.location.search);
+const productId = urlParams.get("id");
+
+let currentProduct = null;
+
+async function loadProduct() {
+  const { data } = await supabaseClient
+    .from("products")
+    .select("*")
+    .eq("id", productId)
+    .single();
+
+  currentProduct = data;
+  // SHOW SOLD OUT BADGE
+if (data.is_soldout) {
+  document.getElementById("soldOutBadge").style.display = "block";
+}
+
+
+  document.getElementById("mainImage").src = data.image_url;
+
+  const thumbs = document.getElementById("thumbnails");
+  thumbs.innerHTML = "";
+
+  [data.image_url, data.image_2, data.image_3].forEach(img => {
+    if (img) {
+      thumbs.innerHTML += `<img src="${img}" onclick="changeImage(this)">`;
+    }
+  });
+
+  document.getElementById("productInfo").innerHTML = `
+    <h2>${data.name}</h2>
+    <p>${data.description}</p>
+    <div class="price">PKR ${data.discount_price || data.price}</div>
+    <button class="add-cart-btn" onclick="addToCart()">Add to Cart</button>
+    <div class="success-message" id="successMsg">Added to cart </div>
+  
+  `;
+}
+
+function changeImage(img) {
+  document.getElementById("mainImage").src = img.src;
+}
+
+function addToCart() {
+
+  // 🚫 STOP IF SOLD OUT
+  if (currentProduct.is_soldout) {
+    showNotification("This item is sold out", "error");
+    return;
+  }
+
+  try {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push(currentProduct);
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    showNotification("Added to cart successfully", "success");
+  } catch (err) {
+    showNotification("Something went wrong", "error");
+  }
+}
+
+
+function showNotification(message, type) {
+  const notification = document.getElementById("notification");
+
+  notification.textContent = message;
+  notification.className = "notify " + type;
+
+  setTimeout(() => {
+    notification.classList.add("show");
+  }, 10);
+
+  setTimeout(() => {
+    notification.classList.remove("show");
+  }, 3000);
+}
+loadProduct();
+
+</script>
+<div id="notification" class="notify"></div>
+</body>
+</html>
