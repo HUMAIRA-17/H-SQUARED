@@ -220,7 +220,7 @@ body {
 
 .bottom-btn {
   flex: 1;
-  padding: 40px;   /* taller buttons */
+  padding: 28px;   /* taller buttons */
   border-radius: 12px;
   border: none;
   font-size: 28px;  /* bigger text */
@@ -290,6 +290,16 @@ body {
 .product-info p {
   font-size: 22px !important;
   line-height: 1.8 !important;
+}
+/* DESKTOP DESCRIPTION SCROLL FIX */
+@media (min-width: 901px) {
+
+  .product-info {
+    max-height: 70vh;     /* limit height */
+    overflow-y: auto;     /* enable vertical scroll */
+    padding-right: 10px;  /* space for scrollbar */
+  }
+
 }
 </style>
 </head>
