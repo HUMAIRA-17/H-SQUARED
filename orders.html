@@ -266,7 +266,7 @@ async function loadOrders() {
     card.className = "order-card";
 
     let itemsHTML = "";
-    let totalPrice = 0;
+    
 
     let items = order.items;
     if (typeof items === "string") {
@@ -274,7 +274,7 @@ async function loadOrders() {
     }
 
     items.forEach(item => {
-      totalPrice += item.price * item.qty;
+      
 
       itemsHTML += `
         <div class="item-box">
@@ -296,7 +296,7 @@ async function loadOrders() {
         <p><strong>Customer:</strong> ${order.customer_name}</p>
         <p><strong>Phone:</strong> ${order.phone}</p>
         <p><strong>Address:</strong> ${order.address}</p>
-        <p><strong>Total:</strong> PKR ${totalPrice}</p>
+        <p><strong>Total:</strong> PKR ${order.total_amount}</p>
 
         <p>
           <strong>Status:</strong> 
