@@ -23,24 +23,23 @@ body {
 
 /* MAIN LAYOUT */
 .product-page {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 80px;
-  padding: 80px 8%;
-  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 5%;
+  display: block;
 }
 
 .product-gallery {
-  flex: 1;
-  max-width: 500px;
-  position: relative; /* IMPORTANT */
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  margin-bottom: 30px;
 }
 
 
 .main-img {
   width: 100%;
-  height: 500px;
+  height: 60vh;
   object-fit: cover;
   border-radius: 16px;
   background: #f4f4f4;
@@ -70,8 +69,8 @@ body {
 
 /* PRODUCT INFO */
 .product-info {
-  flex: 1;
-  max-width: 420px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .product-info h2 {
@@ -120,13 +119,44 @@ body {
 }
 
 @media (max-width: 900px) {
+
   .product-page {
-    padding: 40px 6%;
-    gap: 40px;
+    flex-direction: column;
+    padding: 20px 5%;
+    gap: 25px;
+  }
+
+  .product-gallery {
+    max-width: 100%;
   }
 
   .main-img {
-    height: 380px;
+    width: 100%;
+    height: 50vh; /* half screen height */
+    border-radius: 14px;
+  }
+
+  .thumbnail-row {
+    justify-content: center;
+  }
+
+  .product-info {
+    max-width: 100%;
+  }
+
+  .product-info h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .price {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .product-info p {
+    font-size: 14px;
+    margin-bottom: 20px;
   }
 }
 .notify {
@@ -172,7 +202,70 @@ body {
   z-index: 10;
   letter-spacing: 1px;
 }
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  padding: 15px 20px;
+  display: flex;
+  gap: 15px;
+  box-shadow: 0 -5px 15px rgba(0,0,0,0.08);
+  z-index: 999;
+}
 
+.bottom-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cart-btn {
+  background: #f1f1f1;
+}
+
+.cart-btn:hover {
+  background: #ddd;
+}
+
+.buy-btn {
+  background: var(--primary-pink);
+  color: white;
+}
+
+.buy-btn:hover {
+  background: var(--dark-pink);
+}
+
+/* prevent content from hiding behind bar */
+body {
+  padding-bottom: 90px;
+}
+@media (max-width: 900px) {
+
+  .product-page {
+    display: block !important;
+  }
+
+  .product-gallery,
+  .product-info {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .main-img {
+    width: 100%;
+    height: 55vh;   /* takes more than half screen */
+    object-fit: cover;
+  }
+
+}
 </style>
 </head>
 
@@ -200,6 +293,11 @@ body {
 
   <div class="product-info" id="productInfo"></div>
 
+</div>
+
+<div class="bottom-bar">
+  <button onclick="addToCart()" class="bottom-btn cart-btn">Add to Cart</button>
+  <button onclick="buyNow()" class="bottom-btn buy-btn">Buy Now</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -240,13 +338,10 @@ if (data.is_soldout) {
   });
 
   document.getElementById("productInfo").innerHTML = `
-    <h2>${data.name}</h2>
-    <p>${data.description}</p>
-    <div class="price">PKR ${data.discount_price || data.price}</div>
-    <button class="add-cart-btn" onclick="addToCart()">Add to Cart</button>
-    <div class="success-message" id="successMsg">Added to cart </div>
-  
-  `;
+  <h2>${data.name}</h2>
+  <div class="price">PKR ${data.discount_price || data.price}</div>
+  <p>${data.description}</p>
+`;
 }
 
 function changeImage(img) {
@@ -263,7 +358,13 @@ function addToCart() {
 
   try {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push(currentProduct);
+    cart.push({
+  id: currentProduct.id,
+  name: currentProduct.name,
+  price: currentProduct.discount_price || currentProduct.price,
+  image: currentProduct.image_url,
+  qty: 1
+});
     localStorage.setItem("cart", JSON.stringify(cart));
 
     showNotification("Added to cart successfully", "success");
@@ -272,6 +373,25 @@ function addToCart() {
   }
 }
 
+function buyNow() {
+
+  if (currentProduct.is_soldout) {
+    showNotification("This item is sold out", "error");
+    return;
+  }
+
+  let cart = [];
+  cart.push({
+  id: currentProduct.id,
+  name: currentProduct.name,
+  price: currentProduct.discount_price || currentProduct.price,
+  image: currentProduct.image_url,
+  qty: 1
+});
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  window.location.href = "cart.html";
+}
 
 function showNotification(message, type) {
   const notification = document.getElementById("notification");

@@ -44,16 +44,13 @@ function renderProducts(filteredProducts) {
 
   filteredProducts.forEach(product => {
 
-    const price = product.discount_price || product.price;
-
     productGrid.innerHTML += `
-      <div class="product-card">
-       <a href="product-details.html?id=${product.id}">
-  <div style="position:relative;">
-    ${product.is_soldout ? '<div class="sold-tag">SOLD OUT</div>' : ''}
-    <img src="${product.image_url}">
-  </div>
-</a>
+      <div class="product-card" onclick="openProduct(${product.id})" style="cursor:pointer;">
+        
+        <div style="position:relative;">
+          ${product.is_soldout ? '<div class="sold-tag">SOLD OUT</div>' : ''}
+          <img src="${product.image_url}">
+        </div>
 
         <h3>${product.name}</h3>
 
@@ -70,38 +67,9 @@ function renderProducts(filteredProducts) {
             : `<p><strong>PKR ${product.price}</strong></p>`
         }
 
-        <button class="add-btn"
-          data-id="${product.id}"
-          data-name="${product.name}"
-          data-price="${price}"
-          data-image="${product.image_url}">
-          Add to Cart
-        </button>
       </div>
     `;
   });
-
-  document.querySelectorAll(".add-btn").forEach(btn => {
-  btn.addEventListener("click", function () {
-
-    const productId = Number(this.dataset.id);
-    const product = allProducts.find(p => p.id === productId);
-
-    // 🚫 STOP IF SOLD OUT
-    if (product.is_soldout) {
-      showNotification("This item is sold out", "error");
-      return;
-    }
-
-    addToCart({
-      id: productId,
-      name: this.dataset.name,
-      price: Number(this.dataset.price),
-      image: this.dataset.image
-    });
-
-  });
-});
 
 }
 
@@ -171,3 +139,6 @@ function changeQty(button, change) {
 }
 
 loadProducts();
+function openProduct(id) {
+  window.location.href = "product-details.html?id=" + id;
+}
