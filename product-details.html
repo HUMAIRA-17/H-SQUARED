@@ -36,8 +36,9 @@ body {
 
 .main-img {
   width: 100%;
-  height: 50vh;   /* Half mobile screen */
-  object-fit: cover;
+  height: auto;        /* natural height */
+  max-height: 7;   /* prevent it from being too tall */
+  object-fit: contain; /* show full image */
   border-radius: 12px;
   background: #f4f4f4;
   margin-bottom: 18px;
@@ -155,7 +156,7 @@ body {
 }
 
 .product-info p {
-  font-size: 16px;   /* bigger readable */
+  font-size: 18px;   /* bigger readable */
   line-height: 1.6;
   color: #555;
   margin-bottom: 25px;
@@ -210,7 +211,7 @@ body {
   left: 0;
   width: 100%;
   background: white;
-  padding: 20px 25px;   /* bigger height */
+  padding: 25px 30px;   /* bigger height */
   display: flex;
   gap: 18px;
   box-shadow: 0 -6px 18px rgba(0,0,0,0.12);
@@ -219,10 +220,10 @@ body {
 
 .bottom-btn {
   flex: 1;
-  padding: 18px;   /* taller buttons */
+  padding: 40px;   /* taller buttons */
   border-radius: 12px;
   border: none;
-  font-size: 18px;  /* bigger text */
+  font-size: 28px;  /* bigger text */
   font-weight: 700;
   cursor: pointer;
 }
@@ -249,7 +250,7 @@ body {
   padding-bottom: 90px;
 }
 @media (max-width: 900px) {
-
+ 
   .product-page {
     display: block !important;
   }
@@ -259,7 +260,11 @@ body {
     width: 100% !important;
     max-width: 100% !important;
   }
-
+    .main-img {
+    width: 100%;
+    height: 50vh;        /* EXACT half screen */
+    object-fit: cover;   /* FILL the box */
+  }
  
 
 }
@@ -268,19 +273,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 22px 8%;   /* bigger height */
+  padding: 25px 10%;   /* bigger height */
   background: white;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .navbar .logo {
-  font-size: 26px;   /* bigger logo */
+  font-size: 35px;   /* bigger logo */
   font-weight: 700;
 }
 
 .navbar nav a {
-  font-size: 18px;   /* bigger text */
+  font-size: 25px;   /* bigger text */
   font-weight: 600;
+}
+.product-info p {
+  font-size: 22px !important;
+  line-height: 1.8 !important;
 }
 </style>
 </head>
