@@ -520,18 +520,7 @@ img {
 
 /* ================= HERO FIX ================= */
 
-@media (max-width: 768px) {
 
-  .hero-img img {
-    width: 100%;
-    height: auto;
-    max-width: 350px;
-  }
-
-  .hero-text h1 {
-    font-size: 28px;
-  }
-}
 
 /* ================= PRODUCT CARD FIX ================= */
 
@@ -670,7 +659,7 @@ img {
 }
 }
 
-}
+
 /* ===== NEW NAVBAR ===== */
 .admin-navbar {
   background: white;
