@@ -280,6 +280,10 @@ async function loadOrders() {
         <div class="item-box">
           <img src="${item.image}" />
           <p><strong>${item.name}</strong></p>
+
+          ${item.color ? `<p>Color: ${item.color}</p>` : ""}
+          ${item.size ? `<p>Size: ${item.size}</p>` : ""}
+
           <p>Qty: ${item.qty}</p>
           <p>PKR ${item.price}</p>
         </div>

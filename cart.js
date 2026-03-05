@@ -98,6 +98,10 @@ function renderCart() {
         
         <div class="cart-info">
           <h4>${item.name}</h4>
+
+           ${item.color ? `<p>Color: ${item.color}</p>` : ""}
+           ${item.size ? `<p>Size: ${item.size}</p>` : ""}
+
           <p>PKR ${price}</p>
 
           <div class="qty-box">

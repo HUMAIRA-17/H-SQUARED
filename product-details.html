@@ -304,6 +304,53 @@ body {
 .product-page {
   padding-bottom: 140px;
 }
+/* COLOR BUTTONS */
+
+.color-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.color-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.color-circle.selected {
+  border: 3px solid #e91e63;
+  transform: scale(1.1);
+}
+.color-circle.soldout {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+/* SIZE BUTTONS */
+
+.size-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.size-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-size: 14px;
+  background: white;
+}
+
+.size-btn.selected {
+  background: #e91e63;
+  color: white;
+  border-color: #e91e63;
+}
 </style>
 </head>
 
@@ -375,9 +422,61 @@ if (data.is_soldout) {
     }
   });
 
-  document.getElementById("productInfo").innerHTML = `
+ let colorOptions = "";
+let sizeOptions = "";
+
+if (data.colors) {
+
+  const colors = data.colors.split(",");
+  const soldoutColors = data.soldout_colors
+    ? data.soldout_colors.split(",").map(c => c.trim().toLowerCase())
+    : [];
+
+  colorOptions = `
+  <h4>Select Color</h4>
+  <div class="color-options">
+
+  ${colors.map(c => {
+
+    const color = c.trim();
+    const colorLower = color.toLowerCase();
+    const isSold = soldoutColors.includes(colorLower);
+
+    return `
+      <div class="color-circle ${isSold ? "soldout" : ""}"
+           style="background-color:${colorLower}"
+           ${isSold ? "" : `onclick="selectColor(this,'${colorLower}')"`}>
+      </div>
+    `;
+
+  }).join("")}
+
+  </div>
+  `;
+}
+
+if (data.sizes) {
+  const sizes = data.sizes.split(",");
+
+  sizeOptions = `
+  <h4>Select Size</h4>
+  <div class="size-options">
+    ${sizes.map(s => `
+      <button class="size-btn"
+        onclick="selectSize(this,'${s.trim()}')">
+        ${s.trim()}
+      </button>
+    `).join("")}
+  </div>
+  `;
+}
+document.getElementById("productInfo").innerHTML = `
   <h2>${data.name}</h2>
   <div class="price">PKR ${data.discount_price || data.price}</div>
+
+  ${colorOptions}
+  ${sizeOptions}
+
   <p>${data.description}</p>
 `;
 }
@@ -385,7 +484,28 @@ if (data.is_soldout) {
 function changeImage(img) {
   document.getElementById("mainImage").src = img.src;
 }
+let selectedColor = null;
+let selectedSize = null;
 
+function selectColor(el,color){
+
+  document.querySelectorAll(".color-circle").forEach(c=>{
+    c.classList.remove("selected");
+  });
+
+  el.classList.add("selected");
+  selectedColor = color;
+}
+
+function selectSize(el,size){
+
+  document.querySelectorAll(".size-btn").forEach(s=>{
+    s.classList.remove("selected");
+  });
+
+  el.classList.add("selected");
+  selectedSize = size;
+}
 function addToCart() {
 
   // 🚫 STOP IF SOLD OUT
@@ -396,11 +516,27 @@ function addToCart() {
 
   try {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push({
+   const hasColors = currentProduct.colors && currentProduct.colors.trim() !== "";
+const hasSizes = currentProduct.sizes && currentProduct.sizes.trim() !== "";
+
+if (hasColors && !selectedColor) {
+  showNotification("Please select color", "error");
+  return;
+}
+
+if (hasSizes && !selectedSize) {
+  showNotification("Please select size", "error");
+  return;
+}
+  const color = selectedColor || null;
+const size = selectedSize || null;
+cart.push({
   id: currentProduct.id,
   name: currentProduct.name,
   price: currentProduct.discount_price || currentProduct.price,
   image: currentProduct.image_url,
+  color,
+  size,
   qty: 1
 });
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -419,11 +555,28 @@ function buyNow() {
   }
 
   let cart = [];
-  cart.push({
+  const hasColors = currentProduct.colors && currentProduct.colors.trim() !== "";
+const hasSizes = currentProduct.sizes && currentProduct.sizes.trim() !== "";
+
+if (hasColors && !selectedColor) {
+  showNotification("Please select color", "error");
+  return;
+}
+
+if (hasSizes && !selectedSize) {
+  showNotification("Please select size", "error");
+  return;
+}
+ const color = selectedColor || null;
+const size = selectedSize || null;
+
+cart.push({
   id: currentProduct.id,
   name: currentProduct.name,
   price: currentProduct.discount_price || currentProduct.price,
   image: currentProduct.image_url,
+  color,
+  size,
   qty: 1
 });
   localStorage.setItem("cart", JSON.stringify(cart));
