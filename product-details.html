@@ -351,6 +351,10 @@ body {
   color: white;
   border-color: #e91e63;
 }
+.size-btn.soldout {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 </style>
 </head>
 
@@ -438,18 +442,18 @@ if (data.colors) {
 
   ${colors.map(c => {
 
-    const color = c.trim();
-    const colorLower = color.toLowerCase();
-    const isSold = soldoutColors.includes(colorLower);
+  const color = c.trim();
+  const colorLower = color.toLowerCase();
+  const isSold = soldoutColors.includes(colorLower);
 
-    return `
-      <div class="color-circle ${isSold ? "soldout" : ""}"
-           style="background-color:${colorLower}"
-           ${isSold ? "" : `onclick="selectColor(this,'${colorLower}')"`}>
-      </div>
-    `;
+  return `
+    <button class="size-btn ${isSold ? "soldout" : ""}"
+        ${isSold ? "disabled" : `onclick="selectColor(this,'${colorLower}')"`}>
+        ${color}
+    </button>
+  `;
 
-  }).join("")}
+}).join("")}
 
   </div>
   `;
