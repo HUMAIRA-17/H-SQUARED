@@ -480,11 +480,14 @@ footer {
   left: 10px;
   background: #e91e63;
   color: white;
-  padding: 5px 12px;
-  font-size: 12px;
+  padding: 6px 14px;
+  font-size: 10px;
   font-weight: bold;
   border-radius: 20px;
   z-index: 5;
+
+  white-space: nowrap;
+  display: inline-block;
 }
 /* ================= GLOBAL RESPONSIVE FIX ================= */
 
